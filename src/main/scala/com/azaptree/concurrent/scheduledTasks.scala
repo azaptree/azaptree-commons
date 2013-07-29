@@ -12,13 +12,17 @@ import java.util.concurrent.ScheduledExecutorService
 
 sealed trait TaskSchedule
 
-case class OneTimeTaskSchedule(delay: Long = 0, timeUnit: TimeUnit = SECONDS) extends TaskSchedule
+case class OneTimeTaskSchedule(delay: Long = 0, timeUnit: TimeUnit = SECONDS) extends TaskSchedule {
+  require(delay >= 0, "delay must be >= 0")
+}
 
 case class PeriodicTaskSchedule(initialDelay: Long = 0, period: Long, timeUnit: TimeUnit = SECONDS) extends TaskSchedule {
+  require(initialDelay >= 0, "initialDelay must be >= 0")
   require(period > 0, "period must be > 0")
 }
 
 case class RecurringTaskWithFixedDelayTaskSchedule(initialDelay: Long = 0, delay: Long, timeUnit: TimeUnit = SECONDS) extends TaskSchedule {
+  require(initialDelay >= 0, "initialDelay must be >= 0")
   require(delay > 0, "delay must be > 0")
 }
 
@@ -26,10 +30,10 @@ sealed trait ScheduledTask {
   def schedule(executor: ScheduledExecutorService): ScheduledFuture[_]
 }
 
-case class OneTimeTask(task: () => Unit, schedule: OneTimeTaskSchedule) extends ScheduledTask {
-  override def schedule(executor: ScheduledExecutorService): ScheduledFuture[_] = {
-    val callable: Callable[Unit] = new Callable[Unit]() {
-      override def call(): Unit = task()
+case class OneTimeTask[A](schedule: OneTimeTaskSchedule)(task: () => A) extends ScheduledTask {
+  override def schedule(executor: ScheduledExecutorService): ScheduledFuture[A] = {
+    val callable: Callable[A] = new Callable[A]() {
+      override def call(): A = task()
     }
     executor.schedule(callable, schedule.delay, schedule.timeUnit)
   }
@@ -39,7 +43,7 @@ case class OneTimeTask(task: () => Unit, schedule: OneTimeTaskSchedule) extends 
  * Creates and executes a periodic action that becomes enabled first after the given initial delay, and subsequently with the given period.
  * That is, executions will commence after initialDelay then initialDelay+period, then initialDelay + 2 * period, and so on.
  */
-case class PeriodicTask(task: () => Unit, schedule: PeriodicTaskSchedule) extends ScheduledTask {
+case class PeriodicTask(schedule: PeriodicTaskSchedule)(task: () => Unit) extends ScheduledTask {
   override def schedule(executor: ScheduledExecutorService): ScheduledFuture[_] = {
     val runnable: Runnable = new Runnable() {
       override def run() = task()
@@ -52,7 +56,7 @@ case class PeriodicTask(task: () => Unit, schedule: PeriodicTaskSchedule) extend
  * Creates and executes a periodic action that becomes enabled first after the given initial delay, and
  * subsequently with the given delay between the termination of one execution and the commencement of the next.
  */
-case class RecurringTaskWithFixedDelay(task: () => Unit, schedule: RecurringTaskWithFixedDelayTaskSchedule) extends ScheduledTask {
+case class RecurringTaskWithFixedDelay(schedule: RecurringTaskWithFixedDelayTaskSchedule)(task: () => Unit) extends ScheduledTask {
   override def schedule(executor: ScheduledExecutorService): ScheduledFuture[_] = {
     val runnable: Runnable = new Runnable() {
       override def run() = task()
