@@ -1,13 +1,14 @@
 package com.azaptree.entity
 
 import java.util.UUID
+import com.azaptree.utils.GUID
 
 /**
  * Wrapper class that provides a consistent view of a persistent entity. The Entity separates entity specific fields from the domain specific model.
  * In other words, in order for a class to be an entity, it does not need to extend any class or mixin any trait. Simply, provide an Entity wrapper for it.
  */
 class Entity[+A](
-    val entityId: UUID = UUID.randomUUID(),
+    val entityId: GUID = GUID(),
     val createdOn: Long = System.currentTimeMillis(),
     val createdBy: Option[UUID] = None,
     val entity: A) extends Serializable with Equals {

@@ -4,6 +4,7 @@ import org.scalatest.FeatureSpec
 import org.scalatest.matchers.ShouldMatchers
 import com.azaptree.entity.VersionedEntity
 import java.util.UUID
+import com.azaptree.utils.GUID
 
 class VersionedEnitySpec extends FeatureSpec with ShouldMatchers {
 
@@ -17,7 +18,7 @@ class VersionedEnitySpec extends FeatureSpec with ShouldMatchers {
       foo1.entityId should not be null
       foo1.createdOn should be <= System.currentTimeMillis
 
-      val uuid = UUID.randomUUID()
+      val uuid = GUID()
       val foo2 = new VersionedEntity[Foo](entity = new Foo, entityId = uuid)
       foo2.entityId should be(uuid)
       foo2.createdOn should be <= System.currentTimeMillis

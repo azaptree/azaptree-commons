@@ -5,6 +5,7 @@ import scala.collection.immutable.HashSet
 import org.scalatest.FeatureSpec
 import org.scalatest.matchers.ShouldMatchers
 import com.azaptree.entity.Entity
+import com.azaptree.utils.GUID
 
 class EntityFeatureSpec extends FeatureSpec with ShouldMatchers {
 
@@ -12,7 +13,7 @@ class EntityFeatureSpec extends FeatureSpec with ShouldMatchers {
 
   feature("An Entity's entityId will be universally unique - entityId type is UUID") {
     scenario("Create 1000 new entities and none should have the same entityId") {
-      var entityIds = new HashSet[UUID]()
+      var entityIds = new HashSet[GUID]()
       for (i <- 1 to 1000) {
         entityIds = entityIds + new Entity[Foo](entity = new Foo).entityId
       }
@@ -27,7 +28,7 @@ class EntityFeatureSpec extends FeatureSpec with ShouldMatchers {
       foo1.entityId should not be null
       foo1.createdOn should be <= System.currentTimeMillis
 
-      val uuid = UUID.randomUUID()
+      val uuid = GUID()
       val foo2 = new Entity[Foo](entity = new Foo, entityId = uuid)
       foo2.entityId should be(uuid)
       foo2.createdOn should be <= System.currentTimeMillis
@@ -54,7 +55,7 @@ class EntityFeatureSpec extends FeatureSpec with ShouldMatchers {
     }
 
     scenario("2 instances created using the same entity id will be equal") {
-      val uuid = UUID.randomUUID()
+      val uuid = GUID()
       val foo1 = new Entity[Foo](entity = new Foo, entityId = uuid)
       val foo2 = new Entity[Foo](entity = new Foo, entityId = uuid)
       foo1 should equal(foo2)
@@ -63,7 +64,7 @@ class EntityFeatureSpec extends FeatureSpec with ShouldMatchers {
 
   feature("Two entities that are equal will always have the same hashCode") {
     scenario("2 instances created using the same entityId will have the same hashCode") {
-      val uuid = UUID.randomUUID()
+      val uuid = GUID()
       val foo1 = new Entity[Foo](entity = new Foo, entityId = uuid)
       val foo2 = new Entity[Foo](entity = new Foo, entityId = uuid)
       foo1.## should equal(foo2.##)

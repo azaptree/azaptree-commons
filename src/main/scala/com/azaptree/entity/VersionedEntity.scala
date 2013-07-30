@@ -2,13 +2,14 @@ package com.azaptree.entity
 
 import java.util.UUID
 import java.util.Objects
+import com.azaptree.utils.GUID
 
 /**
  * Used to track entity versions.
  *
  */
 class VersionedEntity[+A](
-    val entityId: UUID = UUID.randomUUID(),
+    val entityId: GUID = GUID(),
     val createdOn: Long = System.currentTimeMillis(),
     val createdBy: Option[UUID] = None,
     val updatedOn: Long = System.currentTimeMillis(),
