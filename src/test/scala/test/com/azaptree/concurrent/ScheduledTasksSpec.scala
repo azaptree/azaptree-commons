@@ -28,9 +28,17 @@ class ScheduledTasksSpec extends FunSuite with ShouldMatchers with BeforeAndAfte
 
     for (i <- 1 to 5) task.schedule(executor)
     counter should be(0)
-    Thread.sleep(1010l)
+
+    val start = System.currentTimeMillis()
+    while (counter < 5) {
+      if (System.currentTimeMillis() - start > 1500l) {
+        counter should be(5)
+      }
+      Thread.`yield`
+    }
 
     counter should be(5)
+
   }
 
   test("A OneTimeTask[A] will validate that delay >= 0") {
@@ -51,7 +59,13 @@ class ScheduledTasksSpec extends FunSuite with ShouldMatchers with BeforeAndAfte
     }
 
     task.schedule(executor)
-    Thread.sleep(1010l)
+    val start = System.currentTimeMillis()
+    while (counter < 2) {
+      if (System.currentTimeMillis() - start > 1500l) {
+        counter should be(2)
+      }
+      Thread.`yield`
+    }
     counter should be(2)
   }
 
@@ -83,7 +97,13 @@ class ScheduledTasksSpec extends FunSuite with ShouldMatchers with BeforeAndAfte
     }
 
     task.schedule(executor)
-    Thread.sleep(1010l)
+    val start = System.currentTimeMillis()
+    while (counter < 2) {
+      if (System.currentTimeMillis() - start > 1500l) {
+        counter should be(2)
+      }
+      Thread.`yield`
+    }
     counter should be(2)
   }
 
